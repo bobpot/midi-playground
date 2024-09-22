@@ -4,18 +4,21 @@ import math
 
 class Particle:
     SPEED_VARIATION = 4
-    SIZE_MIN = 20    # Increase min size for a larger trail
-    SIZE_MAX = 40    # Increase max size for a larger trail
-    AGE_RATE = 25    # Aging rate
+    SIZE_MIN = 20    # Increased min size for a larger, more visible trail
+    SIZE_MAX = 40    # Increased max size
+    AGE_RATE = 25    # Aging rate affects how quickly the particle fades and shrinks
     SLOW_DOWN_RATE = 1.2
-    MAX_STRETCH_FACTOR = 2.5  # Stretch the particles to make them elongated
+    MAX_STRETCH_FACTOR = 2.5  # Elongates the particles for a smoother trail
     MAX_ALPHA = 180           # Start with translucent particles
 
-    def __init__(self, pos: list[float], delta: list[float], invert_color: bool = False):
+    def __init__(self, pos: list[float], delta: list[float], dt: float):
         self.pos = pos.copy()
         self.size = random.randint(Particle.SIZE_MIN, Particle.SIZE_MAX)
-        self.stretch_factor = random.uniform(1.2, Particle.MAX_STRETCH_FACTOR)  # Stretch the particles more
+        self.stretch_factor = random.uniform(1.2, Particle.MAX_STRETCH_FACTOR)  # Stretch the particles
         self.delta = delta.copy()
+        self.dt = dt  # Save the delta time as an instance variable
+
+        # Randomly adjust particle speed slightly
         self.delta[0] += random.randint(-Particle.SPEED_VARIATION, Particle.SPEED_VARIATION) / 8
         self.delta[1] += random.randint(-Particle.SPEED_VARIATION, Particle.SPEED_VARIATION) / 8
 
@@ -25,16 +28,16 @@ class Particle:
 
     def age(self):
         # Shrink particle size
-        self.size -= Particle.AGE_RATE * Config.dt
-        self.x += self.delta[0] * Config.PARTICLE_SPEED
-        self.y += self.delta[1] * Config.PARTICLE_SPEED
+        self.size -= Particle.AGE_RATE * self.dt
+        self.pos[0] += self.delta[0] * self.dt
+        self.pos[1] += self.delta[1] * self.dt
 
         # Slow down particle speed
-        self.delta[0] /= (Particle.SLOW_DOWN_RATE + FRAMERATE) * Config.dt
-        self.delta[1] /= (Particle.SLOW_DOWN_RATE + FRAMERATE) * Config.dt
+        self.delta[0] /= (Particle.SLOW_DOWN_RATE + self.dt)
+        self.delta[1] /= (Particle.SLOW_DOWN_RATE + self.dt)
 
         # Reduce opacity gradually to create fading effect
-        self.alpha -= Particle.AGE_RATE * Config.dt * 5
+        self.alpha -= Particle.AGE_RATE * self.dt * 5
         self.color.a = max(0, int(self.alpha))  # Ensure alpha stays non-negative
 
         # Return True if the particle is too small or fully transparent
@@ -51,7 +54,8 @@ class Particle:
         # Rotate and blit the particle to simulate directional motion
         angle = math.degrees(math.atan2(self.delta[1], self.delta[0]))  # Get the angle of motion
         rotated_particle = pygame.transform.rotate(particle_surface, angle)
-        surface.blit(rotated_particle, (self.x, self.y), special_flags=pygame.BLEND_RGBA_ADD)
+        surface.blit(rotated_particle, (self.pos[0], self.pos[1]), special_flags=pygame.BLEND_RGBA_ADD)
+
 
     @property
     def x(self):
