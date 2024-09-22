@@ -29,10 +29,24 @@ class Config:
             "hallway": pygame.Color(137, 134, 255),
             "background": pygame.Color(24, 26, 30),
             "square": [
-                pygame.Color(224, 26, 79),
-                pygame.Color(173, 247, 182),
-                pygame.Color(249, 194, 46),
-                pygame.Color(83, 179, 203)
+        pygame.Color(255, 182, 193),  # Pastel Pink
+        pygame.Color(253, 253, 150),  # Pastel Yellow
+        pygame.Color(119, 221, 119),  # Pastel Green
+        pygame.Color(174, 198, 207),  # Pastel Blue
+        pygame.Color(177, 156, 217)   # Pastel Purple
+    ]
+
+    # Set initial square color
+    current_square_color = pastel_colors[0]
+
+    # Glow effect for dark_modern theme (if needed)
+    square_glow = True
+    square_glow_duration = 0.8
+    glow_intensity = 15  # 1-40
+    square_min_glow = 7
+    border_color = pygame.Color(255, 255, 255)
+    glow_color = pygame.Color(255, 255, 255)
+
             ]
         },
 
