@@ -21,9 +21,9 @@ def create_border(image: np.ndarray, margin: int, thickness: int, color: Colors)
 
 
 def apply_blooming(image: np.ndarray) -> np.ndarray:
-    # Provide some blurring to image, to create some bloom.
-    cv2.GaussianBlur(image, ksize=(15, 15), sigmaX=20, sigmaY=20, dst=image)
-    cv2.blur(image, ksize=(12, 12), dst=image)
+    # Reduce kernel sizes and sigma values to lessen the blur effect
+    cv2.GaussianBlur(image, ksize=(5, 5), sigmaX=5, sigmaY=5, dst=image)
+    cv2.blur(image, ksize=(3, 3), dst=image)
     return image
 
 
