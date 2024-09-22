@@ -25,9 +25,9 @@ class Config:
     # of hp_bar_fill colors (default (156, 198, 155), (189, 228, 168), (215, 242, 186))
     #
     color_themes = {
-        "dark_modern": {
-            "hallway": pygame.Color(40, 44, 52),
-            "background": pygame.Color(24, 26, 30),
+        "pastel_blue_modern": {
+            "hallway": pygame.Color(137, 170, 209),
+            "background": pygame.Color(109, 119, 126),
             "square": [
                 pygame.Color(224, 26, 79),
                 pygame.Color(173, 247, 182),
