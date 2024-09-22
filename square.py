@@ -10,137 +10,63 @@ from bounce import Bounce
 
 class Square:
     def __init__(self, x: float = 0, y: float = 0, dx: int = 1, dy: int = 1):
-        self.pos: list[float] = [x, y]
-        self.dir: list[int] = [dx, dy]
-        self.last_bounce_time = -100
-        self.latest_bounce_direction = 0  # 0 = horiz, 1 = vert
-        self.past_colors = []
+        self.pos = [x, y]
+        self.dir = [dx, dy]
         self.died = False
-
         self.time_since_glow_start = 0
-        self.glowy_surfaces = {}
-
-        # Initialize the square's color to white (or any other starting color)
-        self.current_color = (255, 255, 255)  # White as default
-
-    def register_past_color(self, col: tuple[int, int, int]):
-        for _ in range(max(Config.square_swipe_anim_speed, 1)):
-            self.past_colors.insert(0, col)
-        while len(self.past_colors) > Config.SQUARE_SIZE * 4 / 5:
-            self.past_colors.pop()
-
-    def get_surface(self, size: tuple[int, int]):
-        ss = int(Config.SQUARE_SIZE * 4 / 5)
-        surf = pygame.Surface((ss, ss))
-        for index, col in enumerate(self.past_colors):
-            y = index if self.dir_y != 1 else ss - 1 - index
-            pygame.draw.line(surf, col, (0, y), (ss, y))
-        return pygame.transform.scale(surf, size)
-
-    def copy(self) -> "Square":
-        new = Square(*self.pos, *self.dir)
-        new.last_bounce_time = self.last_bounce_time
-        new.latest_bounce_direction = self.latest_bounce_direction
-        return new
-
-    @property
-    def x(self):
-        return self.pos[0]
-
-    @property
-    def y(self):
-        return self.pos[1]
-
-    def title_screen_physics(self, bounding: pygame.Rect):
-        self.reg_move()
-        r = self.rect
-        if r.right > bounding.right:
-            self.dir[0] = -1
-            self.latest_bounce_direction = 0
-            self.change_color()  # Change color on impact
-        elif r.left < bounding.left:
-            self.dir[0] = 1
-            self.latest_bounce_direction = 0
-            self.change_color()  # Change color on impact
-        elif r.bottom > bounding.bottom:
-            self.dir[1] = -1
-            self.latest_bounce_direction = 1
-            self.change_color()  # Change color on impact
-        elif r.top < bounding.top:
-            self.dir[1] = 1
-            self.latest_bounce_direction = 1
-            self.change_color()  # Change color on impact
-        else:
-            return False
-        self.start_bounce()
-        self.last_bounce_time = get_current_time()
-        return True
-
-    def change_color(self):
-        """Change the square's color randomly on each bounce."""
-        self.current_color = (np.random.randint(0, 256),  # Random Red
-                              np.random.randint(0, 256),  # Random Green
-                              np.random.randint(0, 256))  # Random Blue
-
-    def compute_glowy_surface(self, rect, val):
-        glowy_borders = make_glowy2((rect.size[0] + 40, rect.size[1] + 40), Color(Config.glow_color), val)
-        surface = pygame.Surface(rect.inflate(100, 100).size, pygame.SRCALPHA)
-        surface.blit(glowy_borders, (20, 20), special_flags=pygame.BLEND_RGBA_ADD)
-        return surface
-
+    
     def draw_glowing3(self, win, rect):
         if self.died:
             return
-
+        
+        # Draw glowing border
         if Config.square_glow:
             if pygame.time.get_ticks() - self.time_since_glow_start < Config.square_glow_duration * 1000:
-                progress = 1 - (pygame.time.get_ticks() - self.time_since_glow_start) / (
-                        Config.square_glow_duration * 1000)
+                progress = 1 - (pygame.time.get_ticks() - self.time_since_glow_start) / (Config.square_glow_duration * 1000)
                 val = int(progress * Config.glow_intensity)
             else:
                 val = 1
             val = max(val, Config.square_min_glow)
-            surf = self.compute_glowy_surface(rect, val)
 
-            win.blit(surf, rect.move(-40, -40).topleft, special_flags=pygame.BLEND_RGBA_ADD)
+            # Draw glow border (this would be where the glow shader is applied)
+            glowy_borders = make_glowy2((rect.size[0] + 40, rect.size[1] + 40), Config.glow_color, val)
+            surface = pygame.Surface(rect.inflate(100, 100).size, pygame.SRCALPHA)
+            surface.blit(glowy_borders, (20, 20), special_flags=pygame.BLEND_RGBA_ADD)
+            win.blit(surface, rect.move(-40, -40).topleft, special_flags=pygame.BLEND_RGBA_ADD)
+        
+        # Draw square with interior color
+        pygame.draw.rect(win, Config.current_square_color, rect)
+    
+    def change_color_on_impact(self):
+        # Choose the next pastel color in the list
+        current_index = Config.pastel_colors.index(Config.current_square_color)
+        new_index = (current_index + 1) % len(Config.pastel_colors)
+        Config.current_square_color = Config.pastel_colors[new_index]
 
-    def draw(self, screen: pygame.Surface, sqrect: pygame.Rect):
-        if self.died:
-            return
-        square_color_index = round((self.dir_x + 1) / 2 + self.dir_y + 1)
-        self.register_past_color(get_colors()["square"][square_color_index % len(get_colors()["square"])])
-
-        if Config.theme == "dark_modern" and make_glowy2 is not None:
-            self.draw_glowing3(screen, sqrect)
-        else:
-            # Fill the square with the current color
-            pygame.draw.rect(screen, self.current_color, sqrect)
-
-            # If you still want to draw the past colors on top
-            sq_surf = self.get_surface(
-                tuple(sqrect.inflate(-int(Config.SQUARE_SIZE / 5), -int(Config.SQUARE_SIZE / 5))[2:]))
-            screen.blit(sq_surf, sq_surf.get_rect(center=sqrect.center))
-
-    @x.setter
-    def x(self, val: int):
-        self.pos[0] = val
-
-    @y.setter
-    def y(self, val: int):
-        self.pos[1] = val
-
-    @property
-    def dir_x(self):
-        return self.dir[0]
-
-    @property
-    def dir_y(self):
-        return self.dir[1]
+    def title_screen_physics(self, bounding: pygame.Rect):
+        self.reg_move()
+        r = self.rect
+        
+        if r.right > bounding.right or r.left < bounding.left:
+            self.dir[0] *= -1  # Reverse horizontal direction
+            self.change_color_on_impact()  # Change color on horizontal boundary impact
+        elif r.bottom > bounding.bottom or r.top < bounding.top:
+            self.dir[1] *= -1  # Reverse vertical direction
+            self.change_color_on_impact()  # Change color on vertical boundary impact
+        
+    def reg_move(self):
+        self.pos[0] += self.dir[0] * Config.square_speed * Config.dt
+        self.pos[1] += self.dir[1] * Config.square_speed * Config.dt
 
     @property
     def rect(self):
-        return pygame.Rect(self.x - Config.SQUARE_SIZE / 2, self.y - Config.SQUARE_SIZE / 2,
-                           *([Config.SQUARE_SIZE] * 2))
+        return pygame.Rect(self.pos[0] - Config.SQUARE_SIZE // 2, self.pos[1] - Config.SQUARE_SIZE // 2, Config.SQUARE_SIZE, Config.SQUARE_SIZE)
+
+# Dummy function to create a glowing border (replace with real shader logic)
+def make_glowy2(size, color, intensity):
+    surface = pygame.Surface(size, pygame.SRCALPHA)
+    pygame.draw.rect(surface, color, surface.get_rect(), intensity)
+    return surface
 
     def start_bounce(self):
         self.time_since_glow_start = pygame.time.get_ticks()
