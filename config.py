@@ -26,7 +26,7 @@ class Config:
     #
     color_themes = {
         "dark_modern": {
-            "hallway": pygame.Color(137, 190, 209),
+            "hallway": pygame.Color(137, 134, 255),
             "background": pygame.Color(24, 26, 30),
             "square": [
                 pygame.Color(224, 26, 79),
