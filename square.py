@@ -20,6 +20,9 @@ class Square:
         self.time_since_glow_start = 0
         self.glowy_surfaces = {}
 
+        # Initialize the square's color to white (or any other starting color)
+        self.current_color = (255, 255, 255)  # White as default
+
     def register_past_color(self, col: tuple[int, int, int]):
         for _ in range(max(Config.square_swipe_anim_speed, 1)):
             self.past_colors.insert(0, col)
@@ -54,20 +57,30 @@ class Square:
         if r.right > bounding.right:
             self.dir[0] = -1
             self.latest_bounce_direction = 0
+            self.change_color()  # Change color on impact
         elif r.left < bounding.left:
             self.dir[0] = 1
             self.latest_bounce_direction = 0
+            self.change_color()  # Change color on impact
         elif r.bottom > bounding.bottom:
             self.dir[1] = -1
             self.latest_bounce_direction = 1
+            self.change_color()  # Change color on impact
         elif r.top < bounding.top:
             self.dir[1] = 1
             self.latest_bounce_direction = 1
+            self.change_color()  # Change color on impact
         else:
             return False
         self.start_bounce()
         self.last_bounce_time = get_current_time()
         return True
+
+    def change_color(self):
+        """Change the square's color randomly on each bounce."""
+        self.current_color = (np.random.randint(0, 256),  # Random Red
+                              np.random.randint(0, 256),  # Random Green
+                              np.random.randint(0, 256))  # Random Blue
 
     def compute_glowy_surface(self, rect, val):
         glowy_borders = make_glowy2((rect.size[0] + 40, rect.size[1] + 40), Color(Config.glow_color), val)
@@ -100,7 +113,10 @@ class Square:
         if Config.theme == "dark_modern" and make_glowy2 is not None:
             self.draw_glowing3(screen, sqrect)
         else:
-            pygame.draw.rect(screen, (0, 0, 0), sqrect)
+            # Fill the square with the current color
+            pygame.draw.rect(screen, self.current_color, sqrect)
+
+            # If you still want to draw the past colors on top
             sq_surf = self.get_surface(
                 tuple(sqrect.inflate(-int(Config.SQUARE_SIZE / 5), -int(Config.SQUARE_SIZE / 5))[2:]))
             screen.blit(sq_surf, sq_surf.get_rect(center=sqrect.center))
