@@ -26,8 +26,8 @@ class Config:
     #
     color_themes = {
         "dark_modern": {
-            "hallway": pygame.Color(40, 44, 52),
-            "background": pygame.Color(24, 26, 30),
+            "hallway": pygame.Color(72, 27, 125),
+            "background": pygame.Color(35, 12, 61),
             "square": [
                 pygame.Color(224, 26, 79),
                 pygame.Color(173, 247, 182),
@@ -187,8 +187,8 @@ class Config:
     square_glow_duration = 0.8
     glow_intensity = 15  # 1-40
     square_min_glow = 7
-    border_color = pygame.Color(255, 255, 255)
-    glow_color = pygame.Color(255, 255, 255)
+    border_color = pygame.Color(212, 177, 2)
+    glow_color = pygame.Color(212, 177, 2)
 
 
 def get_colors():
