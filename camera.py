@@ -53,11 +53,16 @@ class Camera:
             while square.y - lazy_follow_distance < self.y:
                 self.y -= 1
 
-        # smooth camera
-        if self.lock_type == CameraFollow.Smoothed:
-            easing_rate = 3
-            self.x = (square.x - Config.SCREEN_WIDTH / 2) * easing_rate * Config.dt + self.x - easing_rate * self.x * Config.dt
-            self.y = (square.y - Config.SCREEN_HEIGHT / 2) * easing_rate * Config.dt + self.y - easing_rate * self.y * Config.dt
+        # smooth camera with wider FOV
+if self.lock_type == CameraFollow.Smoothed:
+    easing_rate = 3
+    # Adjust the FOV scale factor (increase for wider view)
+    fov_scale = 1.5  # Higher values make the view wider (try adjusting this number to your liking)
+    
+    # Adjusted camera positioning for wider FOV
+    self.x = (square.x - (Config.SCREEN_WIDTH * fov_scale) / 2) * easing_rate * Config.dt + self.x - easing_rate * self.x * Config.dt
+    self.y = (square.y - (Config.SCREEN_HEIGHT * fov_scale) / 2) * easing_rate * Config.dt + self.y - easing_rate * self.y * Config.dt
+
 
         # camera in front of square
         if self.lock_type == CameraFollow.Predictive:
