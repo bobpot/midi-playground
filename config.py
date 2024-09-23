@@ -9,10 +9,10 @@ pygame.init()
 
 class Config:
     # constants
-    rSCREEN_WIDTH = pygame.display.Info().current_w if pygame.display.Info().current_w else 1920
-    rSCREEN_HEIGHT = pygame.display.Info().current_h if pygame.display.Info().current_h else 1080
-    # SCREEN_WIDTH = pygame.display.Info().current_w if pygame.display.Info().current_w else 1920
-    # SCREEN_HEIGHT = pygame.display.Info().current_h if pygame.display.Info().current_h else 1080
+    rSCREEN_WIDTH = pygame.display.Info().current_w if pygame.display.Info().current_w else 2560
+    rSCREEN_HEIGHT = pygame.display.Info().current_h if pygame.display.Info().current_h else 1440
+    # SCREEN_WIDTH = pygame.display.Info().current_w if pygame.display.Info().current_w else 2560
+    # SCREEN_HEIGHT = pygame.display.Info().current_h if pygame.display.Info().current_h else 1440
     CAMERA_SPEED = 500
     SQUARE_SIZE = 50
     PARTICLE_SPEED = 10
@@ -26,8 +26,8 @@ class Config:
     #
     color_themes = {
         "dark_modern": {
-            "hallway": pygame.Color(40, 44, 52),
-            "background": pygame.Color(24, 26, 30),
+            "hallway": pygame.Color(89, 0, 230),
+            "background": pygame.Color(45, 26, 74),
             "square": [
                 pygame.Color(224, 26, 79),
                 pygame.Color(173, 247, 182),
@@ -187,8 +187,8 @@ class Config:
     square_glow_duration = 0.8
     glow_intensity = 15  # 1-40
     square_min_glow = 7
-    border_color = pygame.Color(255, 255, 255)
-    glow_color = pygame.Color(255, 255, 255)
+    border_color = pygame.Color(255, 212, 0)
+    glow_color = pygame.Color(255, 212, 0)
 
 
 def get_colors():
