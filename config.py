@@ -8,17 +8,20 @@ pygame.init()
 
 
 class Config:
-    # constants
-    rSCREEN_WIDTH = pygame.display.Info().current_w if pygame.display.Info().current_w else 1920
-    rSCREEN_HEIGHT = pygame.display.Info().current_h if pygame.display.Info().current_h else 1080
-    # SCREEN_WIDTH = pygame.display.Info().current_w if pygame.display.Info().current_w else 1920
-    # SCREEN_HEIGHT = pygame.display.Info().current_h if pygame.display.Info().current_h else 1080
+    # Constants
+    rSCREEN_WIDTH = 2560  # Increased width for wider screen
+    rSCREEN_HEIGHT = 1440  # Increased height for wider screen
     CAMERA_SPEED = 500
     SQUARE_SIZE = 50
     PARTICLE_SPEED = 10
+    ZOOM = 0.8  # Zoom out by 20%
+
+# In rendering logic:
+square_width = int(Config.SQUARE_SIZE * Config.ZOOM)
+square_height = int(Config.SQUARE_SIZE * Config.ZOOM)
+
 
     # colors
-    #
     # each color theme requires a hallway color, a background color, and at least one square color
     # optionally, the color theme provides an hp_bar_border color (default 10, 9, 8),
     # an hp_bar_background color (default 34, 51, 59), and a list
